@@ -2,7 +2,7 @@ name: PR Title Check
 
 on:
   pull_request:
-    types: [opened, edited, synchronize]
+    types: [opened, edited]
 
 jobs:
   check-title:
@@ -12,8 +12,11 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
-      - name: PR Title Checker
-        uses: AmayaAngel/github-actions-pr-title-checker@v2.2.2
-        with:
-          regex: '^CLOUD-\d+'
-          error_message: 'Pull request title does not start with `CLOUD-` followed by numbers. Please update the title.'
+      - name: Validate PR title
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PREFIX="CLOUD-"
+          if [[ ! "$PR_TITLE" =~ ^$PREFIX[0-9]+ ]]; then
+            echo "Pull request title does not start with $PREFIX followed by numbers. Please update the title."
+            exit 1
+          fi
