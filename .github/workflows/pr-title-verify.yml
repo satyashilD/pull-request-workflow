@@ -1,0 +1,22 @@
+name: PR Title Check
+
+on:
+  pull_request:
+    types: [opened, edited]
+
+jobs:
+  check-title:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Validate PR title
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PREFIX="CLOUD-"
+          if [[ ! "$PR_TITLE" =~ ^$PREFIX[0-9]+ ]]; then
+            echo "Pull request title does not start with $PREFIX followed by numbers. Please update the title."
+            exit 1
+          fi
